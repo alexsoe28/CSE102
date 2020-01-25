@@ -1,6 +1,6 @@
 SOURCES=MWST.cpp
 INCLUDES=$(wildcard *.h)
-TARGET=dog
+TARGET=MWST
 CXXFLAGS=-std=gnu++11 -Wall -Wextra -Wpedantic -Wshadow -g -Og
 LDFLAGS=
 _submit_CXXFLAGS=-std=gnu++11 -Wall -Wextra -Wpedantic -Wshadow -g -O2
