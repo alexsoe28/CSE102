@@ -2,6 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <stdio.h>
 
 struct Graph
 {
@@ -61,7 +63,36 @@ struct Graph
     
 };
 
-int main()
+int main(int argc, char *argv[])
 {
-    return 0;
+    std::ifstream inputFile;
+    std::ofstream outputFile;
+
+    if(argc < 3)
+    {
+        fprintf(stderr, "Require Input and Output Files.\n");
+        exit(EXIT_FAILURE);
+    }
+    std::string inFileName = argv[1];
+    std::string outFileName = argv[2];
+
+    inputFile.open(inFileName);
+    if(!inputFile)
+    {
+        fprintf(stderr, "Unable to open %s.\n", inFileName.c_str());
+        exit(EXIT_FAILURE);
+    }
+    
+
+
+    outputFile.open(outFileName);
+    if(!outputFile)
+    {
+        fprintf(stderr, "Unable to open %s.\n", inFileName.c_str());
+        exit(EXIT_FAILURE);
+    }
+    
+    
+    inputFile.close();
+    outputFile.close();
 }
