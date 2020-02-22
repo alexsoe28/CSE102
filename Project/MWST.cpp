@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <stdio.h>
 
@@ -23,9 +24,9 @@ struct Graph
         }
     }
     
-    void addEdge(int edge1, int edge2, int weight)
+    void addEdge(int vert1, int vert2, int weight)
     {
-        graphEdges.push_back({weight, {edge1, edge2}});
+        graphEdges.push_back({weight, {vert1, vert2}});
     }
 
     int find_set(int i)
@@ -60,19 +61,43 @@ struct Graph
             }
         }
     }
-    
 };
+
+void extractEdge(std::string line, Graph G)
+{
+    std::stringstream s;
+    s << line;
+    std::string temp;
+    int vert1, vert2, weight;
+    
+    s >> temp;
+    std::stringstream(temp) >> vert1;
+    temp = "";
+
+    s >> temp;
+    std::stringstream(temp) >> vert2;
+    temp = "";
+
+    s >> temp;
+    std::stringstream(temp) >> weight;
+    temp = "";
+
+    G.addEdge(vert1, vert2, weight);
+}
 
 int main(int argc, char *argv[])
 {
     std::ifstream inputFile;
     std::ofstream outputFile;
-
+    std::stringstream s;
+    int numVertices; 
+    int numEdges;
     if(argc < 3)
     {
         fprintf(stderr, "Require Input and Output Files.\n");
         exit(EXIT_FAILURE);
     }
+
     std::string inFileName = argv[1];
     std::string outFileName = argv[2];
 
@@ -83,8 +108,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     
-
-
     outputFile.open(outFileName);
     if(!outputFile)
     {
@@ -92,7 +115,24 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     
-    
+    std::string numVertStr;
+    getline(inputFile, numVertStr);
+    numVertices = std::stoi(numVertStr);
+    std::string numEdgesStr;
+    getline(inputFile, numEdgesStr);
+    numEdges = std::stoi(numEdgesStr);
+
+    Graph G(numVertices, numEdges);
+
+    while(inputFile)
+    {
+        std::string line;
+        getline(inputFile, line);
+        extractEdge(line, G);
+    }
+
+    G.kruskal();
+
     inputFile.close();
     outputFile.close();
 }
