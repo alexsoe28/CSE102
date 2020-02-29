@@ -5,12 +5,14 @@
 #include <sstream>
 #include <fstream>
 #include <stdio.h>
+#include <iomanip>
 
 struct Graph
 {
     int numVertices, numEdges;
-    std::vector<std::pair<int, std::pair<int, int>>> graphEdges;
-    std::vector<std::pair<int, std::pair<int, int>>> MST;
+    std::vector<std::tuple<double, int, int, int>> graphEdges;
+    std::vector<std::tuple<double, int, int, int>> MST;
+
     int *set;
 
     Graph(int numVertices, int numEdges)
@@ -24,9 +26,9 @@ struct Graph
         }
     }
     
-    void addEdge(int vert1, int vert2, int weight)
+    void addEdge(int vert1, int vert2, double weight, int label)
     {
-        graphEdges.push_back({weight, {vert1, vert2}});
+        graphEdges.push_back({weight, label, vert1, vert2});
     }
 
     int find_set(int i)
@@ -52,8 +54,8 @@ struct Graph
         sort(graphEdges.begin(), graphEdges.end());
         for(std::size_t i = 0; i < graphEdges.size(); i++)
         {
-            vertex1 = find_set(graphEdges[i].second.first);
-            vertex2 = find_set(graphEdges[i].second.second);
+            vertex1 = find_set(std::get<2>(graphEdges[i]));
+            vertex2 = find_set(std::get<3>(graphEdges[i]));
             if(vertex1 != vertex2)
             {
                 MST.push_back(graphEdges[i]);
@@ -61,37 +63,33 @@ struct Graph
             }
         }
     }
+
+    void print(std::ofstream& outputFile)
+    {
+        double totalWeight = 0;
+        for(std::size_t i = 0; i < MST.size(); i++)
+        {
+            outputFile << std::fixed 
+                       << std::setprecision(1) 
+                       <<  std::get<1>(MST[i]) << ":" 
+                       << "(" << std::get<2>(MST[i]) << ", " << std::get<3>(MST[i]) << ") " 
+                       << std::get<0>(MST[i]) << std::endl;
+            totalWeight += std::get<0>(MST[i]);
+        }
+        outputFile << std::fixed 
+                   << std::setprecision(2)
+                   << "Total Weight = " << totalWeight << std::endl;
+    }
 };
-
-void extractEdge(std::string line, Graph G)
-{
-    std::stringstream s;
-    s << line;
-    std::string temp;
-    int vert1, vert2, weight;
-    
-    s >> temp;
-    std::stringstream(temp) >> vert1;
-    temp = "";
-
-    s >> temp;
-    std::stringstream(temp) >> vert2;
-    temp = "";
-
-    s >> temp;
-    std::stringstream(temp) >> weight;
-    temp = "";
-
-    G.addEdge(vert1, vert2, weight);
-}
 
 int main(int argc, char *argv[])
 {
     std::ifstream inputFile;
     std::ofstream outputFile;
-    std::stringstream s;
     int numVertices; 
     int numEdges;
+    int edge1, edge2;
+    double weight;
     if(argc < 3)
     {
         fprintf(stderr, "Require Input and Output Files.\n");
@@ -124,14 +122,20 @@ int main(int argc, char *argv[])
 
     Graph G(numVertices, numEdges);
 
-    while(inputFile)
+    for(int i = 0; i < numEdges; i++)
     {
+        std::stringstream s;
         std::string line;
-        getline(inputFile, line);
-        extractEdge(line, G);
+        getline(inputFile, line); 
+        s << line;
+        s >> edge1;
+        s >> edge2;
+        s >> weight;
+        G.addEdge(edge1, edge2, weight, i+1);
     }
 
     G.kruskal();
+    G.print(outputFile);
 
     inputFile.close();
     outputFile.close();
