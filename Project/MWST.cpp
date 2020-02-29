@@ -67,11 +67,17 @@ struct Graph
     void print(std::ofstream& outputFile)
     {
         double totalWeight = 0;
+        std::string label = "";
+        std::string spaces = "";
         for(std::size_t i = 0; i < MST.size(); i++)
         {
+            spaces = "    ";
+            label = std::to_string(std::get<1>(MST[i]));
+            spaces.erase(0, label.length());
             outputFile << std::fixed 
-                       << std::setprecision(1) 
-                       <<  std::get<1>(MST[i]) << ":" 
+                       << std::setprecision(1)
+                       << spaces 
+                       << std::get<1>(MST[i]) << ": " 
                        << "(" << std::get<2>(MST[i]) << ", " << std::get<3>(MST[i]) << ") " 
                        << std::get<0>(MST[i]) << std::endl;
             totalWeight += std::get<0>(MST[i]);
